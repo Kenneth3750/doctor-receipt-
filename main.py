@@ -9,10 +9,15 @@ def read_image(img):
     path_to_tesseract = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
     pytesseract.tesseract_cmd = path_to_tesseract 
     text = pytesseract.image_to_string(img) 
+    receipt = get_receipt(text)
+    user_cc = get_CC(text)
+    nap = get_nap(text)
+    return receipt, user_cc, nap
+
+def get_receipt(text):
     lines = text.split('\n')
     receipt = lines[1]
-    user_cc = get_CC(text)
-    return receipt, user_cc
+    return receipt
 
 def get_CC(text):
     keyword = "DOCUMENTO DE IDENTIDAD"
@@ -26,6 +31,21 @@ def get_CC(text):
         return following_text
     else:
         return None
+def get_nap(text):
+    keyword = 'NAP: '
+    position = text.find(keyword)
+    nap_start = (position + len(keyword))
+
+    if position != -1:
+        nap_end = text.find(" ", nap_start )
+        if nap_end != -1:
+            nap_value = text[nap_start:nap_end].strip()
+        else:
+            nap_value = text[nap_start:].strip()
+        return nap_value
+    else: 
+        return None
+    
 
 
 def allowed_file(filename):
